@@ -1,0 +1,68 @@
+<?php
+
+function event_status_node_load($nodes, $types) {
+  //we need to get the UID of the logged in user
+  global $user;
+  $uid = $user->uid;
+  
+  $roles = $user->roles;
+  foreach($roles as $value){
+    if($value == 'event manager'){
+      $role = true;
+      break;
+    }else{
+      $role = false;
+    }
+  }
+  
+  //check user logged as admin or roles user == 'event manager'
+  if(($uid == 1) || ($role == true)){ 
+    //get user id from event registration
+    /*
+    $query = db_select('node');
+    $query
+          ->fields('node', array('uid'))
+          ->condition('node.type', 'event_registration');
+    $results = $query->execute();
+    if(!empty($results)){
+      foreach($results as $result){
+          //update status waitingforpayment --> waitingforpaymentconfirmation
+          $uid_order = $result->uid;        
+          $queryUpdate = db_update('uc_orders')
+                          ->fields(array(
+                                  'order_status' => 'waitingforpaymentconfirmation',
+                          ));
+          $db_and = db_and();    
+          $db_and->condition('uid', $uid_order);
+          $db_and->condition('order_status', 'waitingforpayment');
+
+          //condition
+          $queryUpdate->condition($db_and);
+
+          $resultUpdate = $queryUpdate->execute();
+        }
+      }
+      */
+      
+      $query = db_select('field_data_field_proof_of_payment');
+      $query->fields('field_data_field_proof_of_payment', array('entity_id'))
+            ->condition('field_data_field_proof_of_payment.bundle', 'pendaftaran_kbi');
+      $results = $query->execute();
+      if(!empty($results)){
+        foreach($results as $result){
+          $nid = $result->entity_id;  
+          //status id 16 --> 17 server prod
+          $queryUpdate = db_update('field_data_field_status_pendaftaran')
+                          ->fields(array(
+                                  'field_status_pendaftaran_tid' => '17',
+                          ));
+          $db_and = db_and();    
+          $db_and->condition('entity_id', $nid);
+          $db_and->condition('field_status_pendaftaran_tid', '16');
+          $queryUpdate->condition($db_and);
+          $resultUpdate = $queryUpdate->execute();
+        }
+      }
+    }
+}
+

@@ -1,0 +1,5 @@
+name = Towo Event Status
+description = Provide to update registration status after user confirmed payment. Waiting for Payment to Waiting for Payment Confirmation 
+core = 7.x
+package = Ubercart - Extra
+files[] = event_status.module
